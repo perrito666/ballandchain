@@ -103,8 +103,6 @@ func (e *Entry) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// index with this https://github.com/blevesearch/bleve
-
 // Finish sets the end date for the given entry and persists result
 func (e *Entry) Finish(root string) error {
 	now := time.Now()

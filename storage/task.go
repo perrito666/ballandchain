@@ -32,7 +32,7 @@ func (t *Task) MarshalJSON() ([]byte, error) {
 	return json.MarshalIndent(alias, "", "  ")
 }
 
-// UnmarshalJSON method for Task to ble able to de-serialize Customer
+// UnmarshalJSON method for Task to be able to de-serialize Customer
 func (t *Task) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		CustomerID uuid.UUID `json:"customer"`
@@ -116,7 +116,9 @@ func LoadTasks(root string, c *Customer) (*CustomerTasks, error) {
 	}
 	defer f.Close()
 	m := json.NewDecoder(f)
-	ct := &CustomerTasks{}
+	ct := &CustomerTasks{
+		Customer: c,
+	}
 	err = m.Decode(ct)
 	if err != nil {
 		return nil, fmt.Errorf("decode tasks file: %w", err)
