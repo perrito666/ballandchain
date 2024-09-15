@@ -59,7 +59,12 @@ func (t *Task) UnmarshalJSON(data []byte) error {
 
 // EntriesSavePath returns the entries save path for this task's customer
 func (t *Task) EntriesSavePath(root string) string {
-	return filepath.Join(root, "tasks", t.Customer.ID.String())
+	return EntriesSavePath(root, t.Customer)
+}
+
+// EntriesSavePath returns the entries save path for the passed customer
+func EntriesSavePath(root string, c *Customer) string {
+	return filepath.Join(root, "tasks", c.ID.String())
 }
 
 // EnsureTaskEntriesFolder creates the entries folder if it does not exist and returns it.
@@ -74,6 +79,16 @@ func (t *Task) EnsureTaskEntriesFolder(root string) (string, error) {
 type CustomerTasks struct {
 	Customer *Customer `json:"customer"`
 	Tasks    []*Task   `json:"tasks"`
+}
+
+// AddTask adds a task to the customer tasks, it also indexes it for search.
+func (c *CustomerTasks) AddTask(t *Task) error {
+	c.Tasks = append(c.Tasks, t)
+	err := taskIndex[t.Customer.ID].Index(t.Name, t)
+	if err != nil {
+		return fmt.Errorf("indexing task %s for customer %s: %w", t.Name, c.Customer.Name, err)
+	}
+	return nil
 }
 
 // Save will persist the customer tasks
